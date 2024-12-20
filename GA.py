@@ -1,29 +1,59 @@
 from typing import Tuple 
 import numpy as np
-# you need to install this package `ioh`. Please see documentations here: 
-# https://iohprofiler.github.io/IOHexp/ and
-# https://pypi.org/project/ioh/
+
 import ioh
 from ioh import get_problem, logger, ProblemClass
 
-budget = 5000
+budget = 100000
 
-# To make your results reproducible (not required by the assignment), you could set the random seed by
-# `np.random.seed(some integer, e.g., 42)`
+# To make results reproducible
+np.random.seed(42)
 
 def studentnumber1_studentnumber2_GA(problem: ioh.problem.PBO) -> None:
-    # initial_pop = ... make sure you randomly create the first population
+    population_size = 500  # Adjust based on preference
+    mutation_rate = 1 / problem.meta_data.n_variables  # Inverse of problem dimension
+    crossover_rate = 0.9  # Probability of crossover
 
-    # `problem.state.evaluations` counts the number of function evaluation automatically,
-    # which is incremented by 1 whenever you call `problem(x)`.
-    # You could also maintain a counter of function evaluations if you prefer.
+    # Step 1: Initialize population
+    population = np.random.randint(2, size=(population_size, problem.meta_data.n_variables))
+    
+    # Step 2: Evaluate initial population
+    fitness = np.array([problem(ind) for ind in population])
+    
     while problem.state.evaluations < budget:
-        # please implement the mutation, crossover, selection here
-        # .....
-        # this is how you evaluate one solution `x`
-        # f = problem(x)
-    # no return value needed
-        pass
+        # Step 3: Selection (Tournament Selection)
+        selected_indices = np.random.choice(population_size, size=population_size, replace=True)
+        parents = population[selected_indices]
+
+        # Step 4: Crossover
+        offspring = []
+        for i in range(0, population_size, 2):
+            if np.random.rand() < crossover_rate and i + 1 < population_size:
+                point = np.random.randint(1, problem.meta_data.n_variables)
+                parent1, parent2 = parents[i], parents[i + 1]
+                child1 = np.concatenate((parent1[:point], parent2[point:]))
+                child2 = np.concatenate((parent2[:point], parent1[point:]))
+                offspring.extend([child1, child2])
+            else:
+                offspring.extend([parents[i], parents[i + 1]])
+        
+        offspring = np.array(offspring[:population_size])  # Ensure size consistency
+        
+        # Step 5: Mutation
+        for i in range(population_size):
+            if np.random.rand() < mutation_rate:
+                mutation_point = np.random.randint(problem.meta_data.n_variables)
+                offspring[i][mutation_point] = 1 - offspring[i][mutation_point]  # Flip the bit
+        
+        # Step 6: Evaluate offspring
+        offspring_fitness = np.array([problem(ind) for ind in offspring])
+        
+        # Step 7: Replace population (Elitism)
+        combined_population = np.vstack((population, offspring))
+        combined_fitness = np.hstack((fitness, offspring_fitness))
+        best_indices = np.argsort(combined_fitness)[-population_size:]
+        population = combined_population[best_indices]
+        fitness = combined_fitness[best_indices]
 
 
 def create_problem(dimension: int, fid: int) -> Tuple[ioh.problem.PBO, ioh.logger.Analyzer]:
