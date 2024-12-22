@@ -1,18 +1,11 @@
-from typing import List
-
+from typing import List, Tuple
 import numpy as np
-# you need to install this package `ioh`. Please see documentations here: 
-# https://iohprofiler.github.io/IOHexp/ and
-# https://pypi.org/project/ioh/
 from ioh import get_problem, logger, ProblemClass
 from GA import studentnumber1_studentnumber2_GA, create_problem
 
 budget = 1000000
 
-# To make your results reproducible (not required by the assignment), you could set the random seed by
-# `np.random.seed(some integer, e.g., 42)`
-
-# Hyperparameters to tune, e.g.
+# Hyperparameters to tune
 hyperparameter_space = {
     "population_size": [50, 100, 200],
     "mutation_rate": [0.01, 0.05, 0.1],
@@ -20,31 +13,54 @@ hyperparameter_space = {
 }
 
 # Hyperparameter tuning function
-def tune_hyperparameters() -> List:
-    # You should decide/engineer the `score` youself, which is the tuning objective
+def tune_hyperparameters() -> Tuple[int, float, float]:
     best_score = float('inf')
     best_params = None
-    # create the LABS problem and the data logger
-    F18, _logger = create_problem(dimension=50, fid=18)
-    # create the N-Queens problem and the data logger
-    F23, _logger = create_problem(dimension=49, fid=23)
-    
+
+    # Create LABS problem (F18) and N-Queens problem (F23)
+    F18, _logger_f18 = create_problem(dimension=50, fid=18)
+    F23, _logger_f23 = create_problem(dimension=49, fid=23)
+
     for pop_size in hyperparameter_space['population_size']:
         for mutation_rate in hyperparameter_space['mutation_rate']:
             for crossover_rate in hyperparameter_space['crossover_rate']:
-                # You should initialize you GA implementation with a hyperparameter setting
-                # and execute it on both problems F18, and F23
-                # please decide how many function evaluations you wish to use for running the GA
-                # on each problem per each hyperparameter setting
-                #......
-                pass
+                # Accumulate scores across both problems
+                total_score = 0
+
+                # Run on LABS problem (F18)
+                for _ in range(5):  # Perform 5 independent runs
+                    studentnumber1_studentnumber2_GA(F18, pop_size, mutation_rate, crossover_rate, budget // 2)
+                    total_score += F18.state.current_best.y
+                    F18.reset()  # Reset the problem for the next run
+
+                # Run on N-Queens problem (F23)
+                for _ in range(5):  # Perform 5 independent runs
+                    studentnumber1_studentnumber2_GA(F23, pop_size, mutation_rate, crossover_rate, budget // 2)
+                    total_score += F23.state.current_best.y
+                    F23.reset()  # Reset the problem for the next run
+
+                # Calculate average score
+                avg_score = total_score / 10  # 10 total runs (5 for each problem)
+
+                # Update best parameters
+                if avg_score < best_score:
+                    best_score = avg_score
+                    best_params = (pop_size, mutation_rate, crossover_rate)
+
+                print(f"Evaluated params: pop_size={pop_size}, mutation_rate={mutation_rate}, "
+                      f"crossover_rate={crossover_rate}, avg_score={avg_score}")
+
+    # Close loggers
+    _logger_f18.close()
+    _logger_f23.close()
 
     return best_params
 
 
 if __name__ == "__main__":
-    # Hyperparameter tuning to determine the best parameters for both problems
+    # Tune hyperparameters
     population_size, mutation_rate, crossover_rate = tune_hyperparameters()
-    print(population_size)
-    print(mutation_rate)
-    print(crossover_rate)
+    print("Best hyperparameters:")
+    print("Population Size:", population_size)
+    print("Mutation Rate:", mutation_rate)
+    print("Crossover Rate:", crossover_rate)
