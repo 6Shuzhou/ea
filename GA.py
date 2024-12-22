@@ -4,15 +4,15 @@ import numpy as np
 import ioh
 from ioh import get_problem, logger, ProblemClass
 
-budget = 100000
+budget = 5000
 
-# To make results reproducible
 np.random.seed(42)
 
 def studentnumber1_studentnumber2_GA(problem: ioh.problem.PBO) -> None:
-    population_size = 500  # Adjust based on preference
-    mutation_rate = 1 / problem.meta_data.n_variables  # Inverse of problem dimension
-    crossover_rate = 0.9  # Probability of crossover
+    population_size = 50  # Adjust based on preference
+    # mutation_rate = 1 / problem.meta_data.n_variables  # Inverse of problem dimension
+    mutation_rate = 0.2  # Probability of mutation
+    crossover_rate = 0.5  # Probability of crossover
 
     # Step 1: Initialize population
     population = np.random.randint(2, size=(population_size, problem.meta_data.n_variables))
@@ -21,9 +21,22 @@ def studentnumber1_studentnumber2_GA(problem: ioh.problem.PBO) -> None:
     fitness = np.array([problem(ind) for ind in population])
     
     while problem.state.evaluations < budget:
-        # Step 3: Selection (Tournament Selection)
-        selected_indices = np.random.choice(population_size, size=population_size, replace=True)
+        # # Step 3: Selection (Tournament Selection)
+        # selected_indices = np.random.choice(population_size, size=population_size, replace=True)
+        # parents = population[selected_indices]
+        
+        
+                # Step 3: Selection (Roulette Wheel Selection)
+        total_fitness = fitness.sum()
+        if total_fitness  <= 0 or np.any(fitness < 0):
+            # Handle edge case where all fitnesses are zero
+            probabilities = np.ones(population_size) / population_size
+        else:
+            probabilities = fitness / total_fitness  # Normalize fitness to create selection probabilities
+        
+        selected_indices = np.random.choice(population_size, size=population_size, replace=True, p=probabilities)
         parents = population[selected_indices]
+
 
         # Step 4: Crossover
         offspring = []
@@ -56,20 +69,15 @@ def studentnumber1_studentnumber2_GA(problem: ioh.problem.PBO) -> None:
         fitness = combined_fitness[best_indices]
 
 
-def create_problem(dimension: int, fid: int) -> Tuple[ioh.problem.PBO, ioh.logger.Analyzer]:
-    # Declaration of problems to be tested.
-    problem = get_problem(fid, dimension=dimension, instance=1, problem_class=ProblemClass.PBO)
 
-    # Create default logger compatible with IOHanalyzer
-    # `root` indicates where the output files are stored.
-    # `folder_name` is the name of the folder containing all output. You should compress the folder 'run' and upload it to IOHanalyzer.
+def create_problem(dimension: int, fid: int) -> Tuple[ioh.problem.PBO, ioh.logger.Analyzer]:
+    problem = get_problem(fid, dimension=dimension, instance=1, problem_class=ProblemClass.PBO)
     l = logger.Analyzer(
-        root="data",  # the working directory in which a folder named `folder_name` (the next argument) will be created to store data
-        folder_name="run",  # the folder name to which the raw performance data will be stored
-        algorithm_name="genetic_algorithm",  # name of your algorithm
+        root="data",  
+        folder_name="run", 
+        algorithm_name="genetic_algorithm",  
         algorithm_info="Practical assignment of the EA course",
     )
-    # attach the logger to the problem
     problem.attach_logger(l)
     return problem, l
 
