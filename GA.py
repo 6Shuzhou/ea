@@ -33,43 +33,75 @@ def studentnumber1_studentnumber2_GA(
         selected_indices = np.random.choice(population_size, size=population_size, replace=True, p=probabilities)
         parents = population[selected_indices]
 
-        # # Step 4: Crossover
-        # offspring = []
-        # for i in range(0, population_size, 2):
-        #     if np.random.rand() < crossover_rate and i + 1 < population_size:
-        #         point = np.random.randint(1, problem.meta_data.n_variables)
-        #         parent1, parent2 = parents[i], parents[i + 1]
-        #         child1 = np.concatenate((parent1[:point], parent2[point:]))
-        #         child2 = np.concatenate((parent2[:point], parent1[point:]))
-        #         offspring.extend([child1, child2])
-        #     else:
-        #         offspring.extend([parents[i], parents[i + 1]])
-        
-        # offspring = np.array(offspring[:population_size])  # Ensure size consistency
-        
-        # Step 4: Crossover (Uniform Crossover)
+        # Step 4: Crossover
         offspring = []
         for i in range(0, population_size, 2):
-            if i + 1 < population_size:  # 确保父代数量为偶数
+            if np.random.rand() < crossover_rate and i + 1 < population_size:
+                point = np.random.randint(1, problem.meta_data.n_variables)
                 parent1, parent2 = parents[i], parents[i + 1]
-                if np.random.rand() < crossover_rate:
-            # 生成随机掩码
-                    mask = np.random.randint(2, size=problem.meta_data.n_variables)
-            # 根据掩码生成子代
-                    child1 = np.where(mask == 1, parent1, parent2)
-                    child2 = np.where(mask == 1, parent2, parent1)
-                else:
-            # 不交叉则直接保留父代
-                   child1, child2 = parent1, parent2
+                child1 = np.concatenate((parent1[:point], parent2[point:]))
+                child2 = np.concatenate((parent2[:point], parent1[point:]))
                 offspring.extend([child1, child2])
             else:
-        # 若剩余父代数量为奇数，保留最后一个父代
-                offspring.append(parents[i])
+                offspring.extend([parents[i], parents[i + 1]])
+        
+        offspring = np.array(offspring[:population_size])  # Ensure size consistency
+        
+        # # Step 4: Crossover (Uniform Crossover)
+        # offspring = []
+        # for i in range(0, population_size, 2):
+        #     if i + 1 < population_size:  # 确保父代数量为偶数
+        #         parent1, parent2 = parents[i], parents[i + 1]
+        #         if np.random.rand() < crossover_rate:
+        #     # 生成随机掩码
+        #             mask = np.random.randint(2, size=problem.meta_data.n_variables)
+        #     # 根据掩码生成子代
+        #             child1 = np.where(mask == 1, parent1, parent2)
+        #             child2 = np.where(mask == 1, parent2, parent1)
+        #         else:
+        #     # 不交叉则直接保留父代
+        #            child1, child2 = parent1, parent2
+        #         offspring.extend([child1, child2])
+        #     else:
+        # # 若剩余父代数量为奇数，保留最后一个父代
+        #         offspring.append(parents[i])
 
-        offspring = np.array(offspring[:population_size])  # 确保子代数量一致
+        # offspring = np.array(offspring[:population_size])  # 确保子代数量一致
 
         
-        
+        # # Step 4: 
+        # offspring = []
+        # num_crossover_points = 3  # 设置交叉点数量，可根据需要调整
+        # for i in range(0, population_size, 2):
+        #     if i + 1 < population_size:  # 确保父代数量为偶数
+        #         parent1, parent2 = parents[i], parents[i + 1]
+        #         if np.random.rand() < crossover_rate:
+                    
+        #             crossover_points = sorted(np.random.choice(
+        #                 range(1, problem.meta_data.n_variables),  # 交叉点范围（不包括两端）
+        #                  size=num_crossover_points,
+        #                 replace=False
+        #             ))
+        #         # 初始化子代
+        #             child1, child2 = parent1.copy(), parent2.copy()
+        #             for j in range(len(crossover_points)):
+        #                 start = crossover_points[j]
+        #                 end = crossover_points[j + 1] if j + 1 < len(crossover_points) else problem.meta_data.n_variables
+        #                 if j % 2 == 0:
+        #             # 偶数段交换
+        #                    child1[start:end], child2[start:end] = parent2[start:end], parent1[start:end]
+        #             offspring.extend([child1, child2])
+                
+        #         else:
+        #     # 不交叉则直接保留父代
+        #            child1, child2 = parent1, parent2
+        #         offspring.extend([child1, child2])
+        #     else:
+        # # 若剩余父代数量为奇数，保留最后一个父代
+        #         offspring.append(parents[i])
+
+        # offspring = np.array(offspring[:population_size])  # 确保子代数量一致
+
         
         
         # Step 5: Mutation
