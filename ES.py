@@ -6,24 +6,39 @@ from ioh import get_problem, logger, ProblemClass
 
 budget = 50000
 dimension = 10
-
-# To make your results reproducible (not required by the assignment), you could set the random seed by
-# `np.random.seed(some integer, e.g., 42)`
+np.random.seed(42)
 
 def studentnumber1_studentnumber2_ES(problem):
-    # hint: F18 and F19 are Boolean problems. Consider how to present bitstrings as real-valued vectors in ES
-    # initial_pop = ... make sure you randomly create the first population
+    population_size = 50
+    sigma = 0.2  # 控制变异强度
+    mutation_rate = 0.5  # 位翻转概率
 
-    # `problem.state.evaluations` counts the number of function evaluation automatically,
-    # which is incremented by 1 whenever you call `problem(x)`.
-    # You could also maintain a counter of function evaluations if you prefer.
+    # Step 1: 初始化种群
+    population = np.random.rand(population_size, dimension)
+    
     while problem.state.evaluations < budget:
-        # please implement the mutation, crossover, selection here
-        # .....
-        # this is how you evaluate one solution `x`
-        # f = problem(x)
-        
-    # no return value needed 
+        # Step 2: 变异操作（连续）
+        mutated_population = population + np.random.normal(0, sigma, size=population.shape)
+        mutated_population = np.clip(mutated_population, 0, 1)
+
+        # Step 3: 将连续解转换为布尔解
+        bit_population = (population > 0.5).astype(int)
+        mutated_bit_population = (mutated_population > 0.5).astype(int)
+
+        # Step 4: 对布尔解进行位翻转变异
+        for i in range(population_size):
+            if np.random.rand() < mutation_rate:
+                mutation_point = np.random.randint(dimension)
+                mutated_bit_population[i][mutation_point] ^= 1  # 翻转位
+
+        # Step 5: 评价适应度
+        combined_population = np.vstack((bit_population, mutated_bit_population))
+        fitness = np.array([problem(ind) for ind in combined_population])
+
+        # Step 6: \( (\mu + \lambda) \) 选择
+        best_indices = np.argsort(fitness)[-population_size:]  # 选择适应度最高的个体
+        population = combined_population[best_indices]
+
 
 
 def create_problem(fid: int):
