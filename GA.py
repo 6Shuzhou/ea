@@ -10,9 +10,9 @@ np.random.seed(42)
 
 def studentnumber1_studentnumber2_GA(
     problem: ioh.problem.PBO,
-    population_size: int = 200,
-    mutation_rate: float = 0.5,
-    crossover_rate: float = 0.5,
+    population_size: int = 100,
+    mutation_rate: float = 0.3,
+    crossover_rate: float = 0.7,
     budget: int = 5000
 ) -> None:
     # Step 1: Initialize population
