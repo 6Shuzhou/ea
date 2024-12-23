@@ -8,7 +8,7 @@ budget = 1000000
 # Hyperparameters to tune
 hyperparameter_space = {
     "population_size": [50, 100, 200],
-    "mutation_rate": [0.01, 0.05, 0.1],
+    "mutation_rate": [0.3, 0.5, 0.7],
     "crossover_rate": [0.5, 0.7, 0.9]
 }
 
@@ -29,13 +29,13 @@ def tune_hyperparameters() -> Tuple[int, float, float]:
 
                 # Run on LABS problem (F18)
                 for _ in range(5):  # Perform 5 independent runs
-                    studentnumber1_studentnumber2_GA(F18, pop_size, mutation_rate, crossover_rate, budget // 2)
+                    studentnumber1_studentnumber2_GA(F18, pop_size, mutation_rate, crossover_rate)
                     total_score += F18.state.current_best.y
                     F18.reset()  # Reset the problem for the next run
 
                 # Run on N-Queens problem (F23)
                 for _ in range(5):  # Perform 5 independent runs
-                    studentnumber1_studentnumber2_GA(F23, pop_size, mutation_rate, crossover_rate, budget // 2)
+                    studentnumber1_studentnumber2_GA(F23, pop_size, mutation_rate, crossover_rate)
                     total_score += F23.state.current_best.y
                     F23.reset()  # Reset the problem for the next run
 

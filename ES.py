@@ -9,35 +9,42 @@ dimension = 10
 np.random.seed(42)
 
 def studentnumber1_studentnumber2_ES(problem):
-    population_size = 50
-    sigma = 0.2  # 控制变异强度
-    mutation_rate = 0.5  # 位翻转概率
-
-    # Step 1: 初始化种群
-    population = np.random.rand(population_size, dimension)
+    mu = 10  # Population size (parents)
+    lambda_ = 40  # Offspring size
+    sigma = 0.1  # Mutation strength (standard deviation)
+    
+    # Initialize random population in the problem's bounds
+    population = np.random.uniform(
+        low=-5, high=5, size=(mu, problem.meta_data.n_variables)
+    )
+    
+    # Evaluate initial population
+    fitness = np.array([problem(ind) for ind in population])
     
     while problem.state.evaluations < budget:
-        # Step 2: 变异操作（连续）
-        mutated_population = population + np.random.normal(0, sigma, size=population.shape)
-        mutated_population = np.clip(mutated_population, 0, 1)
-
-        # Step 3: 将连续解转换为布尔解
-        bit_population = (population > 0.5).astype(int)
-        mutated_bit_population = (mutated_population > 0.5).astype(int)
-
-        # Step 4: 对布尔解进行位翻转变异
-        for i in range(population_size):
-            if np.random.rand() < mutation_rate:
-                mutation_point = np.random.randint(dimension)
-                mutated_bit_population[i][mutation_point] ^= 1  # 翻转位
-
-        # Step 5: 评价适应度
-        combined_population = np.vstack((bit_population, mutated_bit_population))
-        fitness = np.array([problem(ind) for ind in combined_population])
-
-        # Step 6: \( (\mu + \lambda) \) 选择
-        best_indices = np.argsort(fitness)[-population_size:]  # 选择适应度最高的个体
+        # Parent selection (randomly choose parents for recombination)
+        parents = population[np.random.choice(mu, size=lambda_, replace=True)]
+        
+        # Recombination (arithmetic crossover)
+        offspring = (parents + parents[np.random.permutation(lambda_)]) / 2
+        
+        # Mutation (Gaussian perturbation)
+        offspring += np.random.normal(0, sigma, offspring.shape)
+        
+        # Ensure offspring are within bounds
+        offspring = np.clip(offspring, -5, 5)
+        
+        # Evaluate offspring
+        offspring_fitness = np.array([problem(ind) for ind in offspring])
+        
+        # Combine parents and offspring (mu + lambda selection)
+        combined_population = np.vstack([population, offspring])
+        combined_fitness = np.hstack([fitness, offspring_fitness])
+        
+        # Select the best mu individuals for the next generation
+        best_indices = np.argsort(combined_fitness)[:mu]
         population = combined_population[best_indices]
+        fitness = combined_fitness[best_indices]
 
 
 
