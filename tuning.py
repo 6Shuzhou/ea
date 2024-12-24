@@ -5,11 +5,10 @@ from GA import studentnumber1_studentnumber2_GA, create_problem
 
 budget = 1000000
 
-# Hyperparameters to tune
 hyperparameter_space = {
-    "population_size": [50, 100,150],
-    "mutation_rate": [ 0.3,0.5,0.9],
-    "crossover_rate": [0.3, 0.7, 0.9]
+    "population_size": [50, 100,200],
+    "mutation_rate": [ 0.3,0.9],
+    "crossover_rate": [0.3, 0.5, 0.9]
 }
 
 # Evaluate hyperparameters across both problems
@@ -35,8 +34,7 @@ def evaluate_hyperparameters(problem_ids: List[int], dimensions: List[int]) -> T
                     # Close logger after each problem
                     _logger.close()
 
-                # Calculate average score across all runs and problems
-                avg_score = total_score / (5 * len(problem_ids))  # Total runs = 5 per problem * number of problems
+                avg_score = total_score / (5 * len(problem_ids)) 
 
                 # Update best parameters
                 if avg_score > best_score:
