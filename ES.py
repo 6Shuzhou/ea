@@ -9,8 +9,8 @@ dimension = 10
 np.random.seed(42)
 
 def studentnumber1_studentnumber2_ES(problem):
-    mu = 10  # Population size (parents)
-    lambda_ = 40  # Offspring size
+    mu = 50  # Population size (parents)
+    lambda_ = 50  # Offspring size
     sigma = 0.1  # Mutation strength (standard deviation)
     
     # Initialize random population in the problem's bounds
@@ -21,7 +21,7 @@ def studentnumber1_studentnumber2_ES(problem):
     # Evaluate initial population
     fitness = np.array([problem(ind) for ind in population])
     
-    while problem.state.evaluations < budget:
+    while problem.state.evaluations +lambda_ <= budget:
         # Parent selection (randomly choose parents for recombination)
         parents = population[np.random.choice(mu, size=lambda_, replace=True)]
         

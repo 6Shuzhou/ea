@@ -7,9 +7,9 @@ budget = 1000000
 
 # Hyperparameters to tune
 hyperparameter_space = {
-    "population_size": [50, 100, 200],
-    "mutation_rate": [0.3, 0.5, 0.7],
-    "crossover_rate": [0.5, 0.7, 0.9]
+    "population_size": [50, 100,150],
+    "mutation_rate": [ 0.3,0.5,0.9],
+    "crossover_rate": [0.3, 0.7, 0.9]
 }
 
 # Evaluate hyperparameters across both problems
