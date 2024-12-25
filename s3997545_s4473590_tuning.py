@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import numpy as np
 from ioh import get_problem, logger, ProblemClass
-from GA import studentnumber1_studentnumber2_GA, create_problem
+from s3997545_s4473590_GA import s3997545_s4473590_GA, create_problem
 
 budget = 1000000
 
@@ -27,7 +27,7 @@ def evaluate_hyperparameters(problem_ids: List[int], dimensions: List[int]) -> T
                     problem, _logger = create_problem(dimension=dimension, fid=problem_id)
 
                     for _ in range(5):  # Perform 5 independent runs
-                        studentnumber1_studentnumber2_GA(problem, pop_size, mutation_rate, crossover_rate)
+                        s3997545_s4473590_GA(problem, pop_size, mutation_rate, crossover_rate)
                         total_score += problem.state.current_best.y
                         problem.reset()  # Reset the problem for the next run
 

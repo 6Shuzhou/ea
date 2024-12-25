@@ -8,12 +8,11 @@ budget = 50000
 dimension = 10
 np.random.seed(42)
 
-def studentnumber1_studentnumber2_ES(problem):
+def s3997545_s4473590_ES(problem):
     mu = 50  # Population size (parents)
     lambda_ = 50  # Offspring size
     sigma = 0.1  # Mutation strength (standard deviation)
     
-    # Initialize random population in the problem's bounds
     population = np.random.uniform(
         low=-5, high=5, size=(mu, problem.meta_data.n_variables)
     )
@@ -70,7 +69,7 @@ if __name__ == "__main__":
     # this how you run your algorithm with 20 repetitions/independent run
     F23, _logger = create_problem(23)
     for run in range(20): 
-        studentnumber1_studentnumber2_ES(F23)
+        s3997545_s4473590_ES(F23)
         F23.reset() # it is necessary to reset the problem after each independent run
     _logger.close() # after all runs, it is necessary to close the logger to make sure all data are written to the folder
 

@@ -8,7 +8,7 @@ budget = 5000
 
 np.random.seed(42)
 
-def studentnumber1_studentnumber2_GA(
+def s3997545_s4473590_GA(
     problem: ioh.problem.PBO,
     population_size: int = 50,
     mutation_rate: float = 0.9,
@@ -82,13 +82,13 @@ if __name__ == "__main__":
     # create the LABS problem and the data logger
     F18, _logger = create_problem(dimension=50, fid=18)
     for run in range(20): 
-        studentnumber1_studentnumber2_GA(F18)
+        s3997545_s4473590_GA(F18)
         F18.reset() # it is necessary to reset the problem after each independent run
     _logger.close() # after all runs, it is necessary to close the logger to make sure all data are written to the folder
 
     # create the N-Queens problem and the data logger
     F23, _logger = create_problem(dimension=49, fid=23)
     for run in range(20): 
-        studentnumber1_studentnumber2_GA(F23)
+        s3997545_s4473590_GA(F23)
         F23.reset()
     _logger.close()
